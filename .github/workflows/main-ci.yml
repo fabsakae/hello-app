@@ -1,0 +1,91 @@
+name: Build and Push Docker Image and Update Manifest
+
+on:
+  push:
+    branches:
+      - main # Dispara o workflow em todo push para a branch main
+  pull_request:
+    branches:
+      - main # Dispara o workflow em todo pull request para a branch main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Para o checkout do hello-app e commits/PRs se fossem no mesmo repo
+      packages: write # Permissão para publicar pacotes (imagens Docker, se fosse GitHub Packages)
+
+    steps:
+    - name: Checkout hello-app code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Necessário para obter o histórico completo e usar github.sha
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }} # Usa o segredo DOCKER_USERNAME
+        password: ${{ secrets.DOCKER_PASSWORD }} # Usa o segredo DOCKER_PASSWORD (PAT do Docker Hub)
+
+    - name: Build and push Docker image
+      id: docker_build
+      uses: docker/build-push-action@v5
+      with:
+        context: . # O contexto da build é o diretório atual do repositório
+        push: true # Indica para fazer o push da imagem para o registry
+        # Tags da imagem: latest e com o SHA do commit (para controle de versão)
+        tags: ${{ secrets.DOCKER_USERNAME }}/hello-app:latest,${{ secrets.DOCKER_USERNAME }}/hello-app:${{ github.sha }}
+
+  update-manifest:
+    runs-on: ubuntu-latest
+    needs: build-and-push # Este job só roda depois que o job 'build-and-push' for concluído com sucesso
+    permissions:
+      contents: write # Permite que este job escreva no repositório de manifests
+      pull-requests: write # Permite que este job crie pull requests
+
+    steps:
+    - name: Checkout hello-manifests repository
+      uses: actions/checkout@v4
+      with:
+        repository: fabsakae/hello-manifests # **MUITO IMPORTANTE: Garanta que 'fabsakae' é seu usuário real**
+        ref: main # A branch do repositório de manifests que será clonada para alteração
+        ssh-key: ${{ secrets.SSH_PRIVATE_KEY }} # Usa a chave SSH privada para autenticação no hello-manifests
+        # Não use 'token' aqui, pois estamos usando SSH para cross-repo access
+
+    - name: Configure Git
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Create manifest file (placeholder for Etapa 3)
+      run: |
+        # Este passo é um placeholder para a criação do manifesto.
+        # Na Etapa 3, vamos criar os arquivos reais de deployment e service.
+        # Por enquanto, apenas criamos um arquivo dummy para testar o PR.
+        mkdir -p k8s # Cria uma pasta para os manifestos
+        echo "apiVersion: apps/v1" > k8s/deployment.yaml
+        echo "kind: Deployment" >> k8s/deployment.yaml
+        echo "metadata:" >> k8s/deployment.yaml
+        echo "  name: hello-app" >> k8s/deployment.yaml
+        echo "spec:" >> k8s/deployment.yaml
+        echo "  template:" >> k8s/deployment.yaml
+        echo "    spec:" >> k8s/deployment.yaml
+        echo "      containers:" >> k8s/deployment.yaml
+        echo "      - name: hello-app" >> k8s/deployment.yaml
+        echo "        image: ${{ secrets.DOCKER_USERNAME }}/hello-app:${{ github.sha }}" >> k8s/deployment.yaml
+        echo "Placeholder manifest 'k8s/deployment.yaml' created with new image tag."
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ secrets.GH_PAT_FOR_PR }} # Usa o PAT do GitHub para criar o PR
+        commit-message: "feat(image): Atualiza imagem do hello-app para ${{ github.sha }}"
+        branch: "update-image-${{ github.sha }}" # Nome da branch que será criada no hello-manifests
+        base: main # Branch de destino do PR no hello-manifests
+        title: "Atualiza imagem do hello-app para ${{ github.sha }}"
+        body: "Este PR automático atualiza a tag da imagem do hello-app para `${{ github.sha }}`."
+        labels: automation, image-update # Adiciona labels ao PR
+        add-paths: 'k8s/deployment.yaml' # O caminho do arquivo que foi alterado para incluir no PR
