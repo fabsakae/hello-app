@@ -56,6 +56,35 @@ Create Pull Request: Em vez de fazer a alteração diretamente, o workflow cria 
 # Objetivos da Etapa 3:
 
 * Criar os arquivos de manifesto Kubernetes `deployment.yaml e service.yaml` para a sua aplicação hello-app dentro do repositório hello-manifests. 
-* O `deployment.yaml` definirá como o Kubernetes irá implantar sua aplicação (qual imagem usar, quantos pods, etc.). 
-* O service.yaml definirá como sua aplicação será exposta dentro e fora do cluster. 
-* O arquivo placeholder k8s/deployment.yaml que o workflow criou no Pull Request atual será o ponto de partida para o seu deployment.yaml real.
+
+* Subpasta hello-manifests:
+
+```Bash
+
+mkdir ~/github-projetos/git-argocd/hello-manifests
+```
+* Navegar para essa nova pasta:
+
+```Bash
+
+cd ~/github-projetos/git-argocd/hello-manifests
+```
+* Clonar seu repositório hello-manifests do GitHub para esta pasta:
+
+```Bash
+
+git clone https://github.com/fabsakae/hello-manifests.git .
+```
+
+* O `deployment.yaml` definirá como o Kubernetes irá implantar sua aplicação (qual imagem usar, quantos pods, etc.). O `deployment.yaml` com o conteúdo atualizado `replicas: 1, image: fabsakae/hello-app:latest, port: 8000`.
+
+```Bash
+code k8s/deployment.yaml
+```
+* O `service.yaml` definirá como sua aplicação será exposta dentro e fora do cluster. O `service.yaml` criado com a configuração de LoadBalancer para a porta 80, roteando para a porta 8000 do contêiner.
+
+```Bash
+touch k8s/service.yaml
+code k8s/service.yaml
+```
+* O arquivo placeholder k8s/deployment.yaml que o workflow criou no Pull Request atual será o ponto de partida para o seu deployment.yaml real. O repositório hello-manifests com os arquivos de manifesto Kubernetes (deployment.yaml e service.yaml) prontos para serem usados pelo ArgoCD.
