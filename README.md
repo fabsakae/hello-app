@@ -51,6 +51,11 @@ Update image tag in manifest file: Este é um passo crucial para o GitOps. A ide
 
 Create Pull Request: Em vez de fazer a alteração diretamente, o workflow cria um Pull Request no repositório hello-manifests. Isso é uma boa prática em GitOps: permite revisão humana das mudanças nos manifestos antes que elas sejam aplicadas ao cluster pelo ArgoCD.
 ```
+# Etapa 3 - Repositório Git com os manifests do ArgoCD
 
+# Objetivos da Etapa 3:
 
-* Ter acesso de gravação ao repositório de manifests usado pelo ArgoCD
+* Criar os arquivos de manifesto Kubernetes `deployment.yaml e service.yaml` para a sua aplicação hello-app dentro do repositório hello-manifests. 
+* O `deployment.yaml` definirá como o Kubernetes irá implantar sua aplicação (qual imagem usar, quantos pods, etc.). 
+* O service.yaml definirá como sua aplicação será exposta dentro e fora do cluster. 
+* O arquivo placeholder k8s/deployment.yaml que o workflow criou no Pull Request atual será o ponto de partida para o seu deployment.yaml real.
