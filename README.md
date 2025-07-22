@@ -6,9 +6,9 @@ Práticas de automação no ciclo de desenvolvimento com GitHub Actions e ArgoCD
 Automatizar o ciclo completo de desenvolvimento, build, deploy e
 execução de uma aplicação FastAPI simples, usando GitHub Actions para
 CI/CD, Docker Hub como registry, e ArgoCD para entrega contínua em
-Kubernetes local com Rancher Desktop.
+Kubernetes local com MiniKube.
 
-# Etapa 1 – Criar a aplicação FastAPI:
+## Etapa 1 – Criar a aplicação FastAPI:
 
 * Criar um repositório Git para o projeto `hello-app` com o arquivo
 main.py.
@@ -17,7 +17,7 @@ main.py.
 
 * Criar um repositório Git para os manifestos do ArgoCD `hello-manifests`.
 
-# Etapa 2 – Criar o GitHub Actions (CI/CD)
+## Etapa 2 – Criar o GitHub Actions (CI/CD)
 
 1. Criar o arquivo de workflow no github actions para buildar a imagem Docker da aplicação e fazer o push da imagem no Docker Hub, que será o nosso container registry neste projeto.
 
@@ -58,7 +58,7 @@ cat ~/.ssh/github_actions_key.pub
 * Adicionar `GH_PAT_FOR_PR` (Personal Access Token (PAT) no GitHub) no Repositório hello-app como segredos no GitHub. O GH_PAT_FOR_PR (Personal Access Token do GitHub) é usado especificamente pela action peter-evans/create-pull-request para ter permissão de criar um Pull Request no hello-manifests.
 
 
-# Etapa 3 - Repositório Git com os manifests do ArgoCD
+## Etapa 3 - Repositório Git com os manifests do ArgoCD
 
 # Objetivos da Etapa 3:
 
@@ -100,3 +100,81 @@ touch k8s/service.yaml
 code k8s/service.yaml
 ```
 * O arquivo placeholder k8s/deployment.yaml que o workflow criou no Pull Request atual será o ponto de partida para o deployment.yaml real. O repositório hello-manifests com os arquivos de manifesto Kubernetes (deployment.yaml e service.yaml) prontos para serem usados pelo ArgoCD.
+
+## Etapa 4 – Criar o App no ArgoCD
+• Na interface do ArgoCD criar o vínculo com o repositório de manifestos.
+
+1. Verifique se o Minikube está instalado:
+
+```Bash
+
+minikube status
+```
+2. inicie-o:
+
+```Bash
+
+minikube start
+```
+3. Verifique a instalação do ArgoCD:
+
+```Bash
+
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
+4. Acessar https://localhost:8080 no navegador.
+
+• Criar a aplicação no ArgoCD:
+
+1. Clique em + New App.
+
+2. Preencha os detalhes:
+
+3. Application Name: `hello-app`
+
+4. Project: default
+
+5. Sync Policy: Automatic (com PRUNE e SELF HEAL marcados).
+
+6. Repository URL: https://github.com/fabsakae/hello-manifests.git
+
+7. Revision: HEAD
+
+8. Path: k8s
+
+9. Cluster Name: in-cluster
+
+10. Namespace: default
+
+11. Create.
+
+O ArgoCD começará a sincronizar e detectará o deployment.yaml e o service.yaml em hello-manifests/k8s e tentará criá-los no seu cluster Minikube.
+
+## Etapa 5 – Acessar e testar a aplicação localmente
+# 1. Verifique o status dos pods no Minikube:
+
+```Bash
+kubectl get pods -n default -l app=hello-app
+```
+1.1. Verifique o status do serviço no Minikube:
+```Bash
+kubectl get svc -n default hello-app-service
+```
+1.2. Como estou usando o Minikube, em um outro terminal:
+```Bash
+minikube tunnel
+```
+1.3. Acesse a aplicação via navegador (o EXTERNAL-IP deve mostrar um IP 127.0.0.1):
+```Bash
+kubectl get svc -n default hello-app-service
+```
+1.4. Acesse a aplicação:
+* No navegador web, digite o endereço: http://127.0.0.1:80
+
+* Ou, usando curl no terminal WSL/Ubuntu:
+```Bash
+curl http://127.0.0.1:80
+```
+# 2. Alterar o repositório da aplicação:
+2.1. Modificar a mensagem dentro do código python de Hello World para qualquer outra mensagem.
+2.2. Verificar se, após o processo de CI/CD, a imagem foi atualizada no ambiente Kubernetes.
