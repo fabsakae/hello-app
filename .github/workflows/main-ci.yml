@@ -65,12 +65,11 @@ jobs:
     - name: Update manifest
       run: |
       
-      sed -i 's|image: fabsakae/hello-app:.*|image: fabsakae/hello-app:${{ github.sha }}|' k8s/deployment.yaml
-
-    # Adiciona a alteração do deployment.yaml ao Git
-      git add k8s/deployment.yaml
-    # Faz o commit da alteração
-      git commit -m "feat(image): Atualiza imagem do hello-app para ${{ github.sha }}"
+        sed -i 's|image: fabsakae/hello-app:.*|image: fabsakae/hello-app:${{ github.sha }}|' k8s/deployment.yaml
+        
+        git add k8s/deployment.yaml
+    
+        git commit -m "feat(image): Atualiza imagem do hello-app para ${{ github.sha }}"
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v6
