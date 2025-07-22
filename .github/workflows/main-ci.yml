@@ -60,23 +60,23 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-    - name: Create manifest file (placeholder for Etapa 3)
+    # ... (Seu job 'update-manifest' antes do passo 'Create manifest file')
+
+    - name: Configure Git # Este passo já existe, apenas para referência
       run: |
-        # Este passo é um placeholder para a criação do manifesto.
-        # Na Etapa 3, vamos criar os arquivos reais de deployment e service.
-        # Por enquanto, apenas criamos um arquivo dummy para testar o PR.
-        mkdir -p k8s # Cria uma pasta para os manifestos
-        echo "apiVersion: apps/v1" > k8s/deployment.yaml
-        echo "kind: Deployment" >> k8s/deployment.yaml
-        echo "metadata:" >> k8s/deployment.yaml
-        echo "  name: hello-app" >> k8s/deployment.yaml
-        echo "spec:" >> k8s/deployment.yaml
-        echo "  template:" >> k8s/deployment.yaml
-        echo "    spec:" >> k8s/deployment.yaml
-        echo "      containers:" >> k8s/deployment.yaml
-        echo "      - name: hello-app" >> k8s/deployment.yaml
-        echo "        image: ${{ secrets.DOCKER_USERNAME }}/hello-app:${{ github.sha }}" >> k8s/deployment.yaml
-        echo "Placeholder manifest 'k8s/deployment.yaml' created with new image tag."
+       git config --global user.name "github-actions[bot]"
+       git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      # SUBSTITUA TODO O BLOCO "Create manifest file (placeholder for Etapa 3)" ABAIXO POR ESTE NOVO BLOCO:
+    - name: Update manifest
+      run: |
+      
+      sed -i 's|image: fabsakae/hello-app:.*|image: fabsakae/hello-app:${{ github.sha }}|' k8s/deployment.yaml
+
+    # Adiciona a alteração do deployment.yaml ao Git
+      git add k8s/deployment.yaml
+    # Faz o commit da alteração
+      git commit -m "feat(image): Atualiza imagem do hello-app para ${{ github.sha }}"
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v6
