@@ -62,12 +62,6 @@ jobs:
 
     # ... (Seu job 'update-manifest' antes do passo 'Create manifest file')
 
-    - name: Configure Git # Este passo já existe, apenas para referência
-      run: |
-       git config --global user.name "github-actions[bot]"
-       git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      # SUBSTITUA TODO O BLOCO "Create manifest file (placeholder for Etapa 3)" ABAIXO POR ESTE NOVO BLOCO:
     - name: Update manifest
       run: |
       
