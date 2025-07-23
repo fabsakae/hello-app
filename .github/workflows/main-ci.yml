@@ -12,8 +12,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Para o checkout do hello-app e commits/PRs se fossem no mesmo repo
-      packages: write # Permissão para publicar pacotes (imagens Docker, se fosse GitHub Packages)
+      contents: write # Para o checkout do hello-app e commits/PRs
+      packages: write # Permissão para publicar pacotes (imagens Docker)
 
     steps:
     - name: Checkout hello-app code
@@ -50,17 +50,17 @@ jobs:
     - name: Checkout hello-manifests repository
       uses: actions/checkout@v4
       with:
-        repository: fabsakae/hello-manifests # **MUITO IMPORTANTE: Garanta que 'fabsakae' é seu usuário real**
+        repository: fabsakae/hello-manifests 
         ref: main # A branch do repositório de manifests que será clonada para alteração
         ssh-key: ${{ secrets.SSH_PRIVATE_KEY }} # Usa a chave SSH privada para autenticação no hello-manifests
-        # Não use 'token' aqui, pois estamos usando SSH para cross-repo access
+        
 
     - name: Configure Git
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-    # ... (Seu job 'update-manifest' antes do passo 'Create manifest file')
+    
 
     - name: Update manifest
       run: |
