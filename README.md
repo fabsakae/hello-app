@@ -35,7 +35,7 @@ Build and push Docker image: Construir a imagem Docker da sua aplicação (usand
 
 Checkout hello-manifests repository: Baixar o conteúdo do seu repositório hello-manifests (o que contém as configurações do Kubernetes) para que ele possa ser modificado.
 
-Update image tag in manifest file: Este é um passo crucial para o GitOps. A ideia é que, uma vez que uma nova imagem Docker é criada e publicada, o workflow automaticamente atualize o arquivo de manifesto do Kubernetes (que estará no hello-manifests) para usar a nova tag da imagem (o SHA do commit). Isso garante que o ArgoCD (que monitora o hello-manifests) detecte a mudança e implante a nova versão da sua aplicação.
+Update image tag in manifest file:  Uma vez que uma nova imagem Docker é criada e publicada, o workflow automaticamente atualiza o arquivo de manifesto do Kubernetes (que estará no hello-manifests) para usar a nova tag da imagem (o SHA do commit). Isso garante que o ArgoCD (que monitora o hello-manifests) detecte a mudança e implante a nova versão da sua aplicação. https://github.com/fabsakae/hello-manifests.git
 ```
 
 2.  Criar um Pull Request no repositório de manifestos `hello-manifests`, alterando a tag da imagem.
