@@ -1,5 +1,5 @@
 # Pipeline CI/CD com GitHub Actions e GitOps com ArgoCD `hello-app`
-Este projeto demonstra uma automação completa de entrega de software, desde o código-fonte até a implantação em um cluster Kubernetes, utilizando as melhores práticas de Integração Contínua (CI), Entrega Contínua (CD) e GitOps.
+Este projeto demonstra uma automação completa de entrega de software, desde o código-fonte até a implantação em um cluster Kubernetes, utilizando as melhores práticas de Integração Contínua (CI), Entrega Contínua (CD) e GitOps. Repositório Git para os manifestos do ArgoCD, https://github.com/fabsakae/hello-manifests.git
 
 ### Objetivo:
 
